@@ -26,29 +26,55 @@ func (model *{{.struct}}) Delete(query interface{}) (err error) {
 }
 
 func (model *{{.struct}}) FindByID() (err error) {
-	query := bson.M{"_id": {{.struct}}.{{.id}}}
+	query := bson.M{
+		"_id": {{.struct}}.{{.id}},
+		{{ if .soft_delete }}
+		"{{.soft_delete_bson_name}}": false,
+		{{ end }}
+	}
 	return model.Find(query)
 }
 
 func (model *{{.struct}}) Find(query interface{}) (err error) {
+	{{ if .soft_delete }}
+	mQuery := query.(map[string]interface{})
+	mQuery["{{.soft_delete_bson_name}}"] = false
+	{{ end }}
 	return {{.client}}.FindOne(model, query)
 }
 
 func (model *{{.struct}}) FindAll(query interface{}) (modelList []{{.struct}}, err error) {
+	{{ if .soft_delete }}
+	mQuery := query.(map[string]interface{})
+	mQuery["{{.soft_delete_bson_name}}"] = false
+	{{ end }}
 	return {{.client}}.FindAll(modelList, query)
 }
 
 func (model *{{.struct}}) Find4Iter(query interface{}) (iter *mgo.Iter, err error) {
+	{{ if .soft_delete }}
+	mQuery := query.(map[string]interface{})
+	mQuery["{{.soft_delete_bson_name}}"] = false
+	{{ end }}
 	return {{.client}}.FindAll4Iter(query)
 }
 
 func (model *{{.struct}}) FindPage(query interface{}, iPageSize, iPageIndex int, SortedStrs ...string) (err error) {
+	{{ if .soft_delete }}
+	mQuery := query.(map[string]interface{})
+	mQuery["{{.soft_delete_bson_name}}"] = false
+	{{ end }}
 	return {{.client}}.FindPage(query)
 }
 
 func (model *{{.struct}}) UpdateByID() (err error) {
 	objectID := {{.struct}}.{{.id}}
-	query := bson.M{"_id": objectID}
+	query := bson.M{
+		"_id": {{.struct}}.{{.id}},
+		{{ if .soft_delete }}
+		"{{.soft_delete_bson_name}}": false,
+		{{ end }}
+	}
 	{{ if .update_at }}
 	model.{{.update_at}} = time.Now().UTC()
 	{{ end }}
@@ -56,6 +82,10 @@ func (model *{{.struct}}) UpdateByID() (err error) {
 }
 
 func (model *{{.struct}}) Update(query interface{}) (err error) {
+	{{ if .soft_delete }}
+	mQuery := query.(map[string]interface{})
+	mQuery["{{.soft_delete_bson_name}}"] = false
+	{{ end }}
 	{{ if .update_at }}
 	model.{{.update_at}} = time.Now().UTC()
 	{{ end }}

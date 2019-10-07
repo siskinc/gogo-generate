@@ -23,29 +23,53 @@ func (model *MogormTest) Delete(query interface{}) (err error) {
 }
 
 func (model *MogormTest) FindByID() (err error) {
-	query := bson.M{"_id": MogormTest.AA}
+	query := bson.M{
+		"_id": MogormTest.AA,
+
+		"soft_deleted": false,
+	}
 	return model.Find(query)
 }
 
 func (model *MogormTest) Find(query interface{}) (err error) {
+
+	mQuery := query.(map[string]interface{})
+	mQuery["soft_deleted"] = false
+
 	return Client.FindOne(model, query)
 }
 
 func (model *MogormTest) FindAll(query interface{}) (modelList []MogormTest, err error) {
+
+	mQuery := query.(map[string]interface{})
+	mQuery["soft_deleted"] = false
+
 	return Client.FindAll(modelList, query)
 }
 
 func (model *MogormTest) Find4Iter(query interface{}) (iter *mgo.Iter, err error) {
+
+	mQuery := query.(map[string]interface{})
+	mQuery["soft_deleted"] = false
+
 	return Client.FindAll4Iter(query)
 }
 
 func (model *MogormTest) FindPage(query interface{}, iPageSize, iPageIndex int, SortedStrs ...string) (err error) {
+
+	mQuery := query.(map[string]interface{})
+	mQuery["soft_deleted"] = false
+
 	return Client.FindPage(query)
 }
 
 func (model *MogormTest) UpdateByID() (err error) {
 	objectID := MogormTest.AA
-	query := bson.M{"_id": objectID}
+	query := bson.M{
+		"_id": MogormTest.AA,
+
+		"soft_deleted": false,
+	}
 
 	model.UpdateAt = time.Now().UTC()
 
@@ -53,6 +77,9 @@ func (model *MogormTest) UpdateByID() (err error) {
 }
 
 func (model *MogormTest) Update(query interface{}) (err error) {
+
+	mQuery := query.(map[string]interface{})
+	mQuery["soft_deleted"] = false
 
 	model.UpdateAt = time.Now().UTC()
 
