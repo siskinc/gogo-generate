@@ -100,8 +100,9 @@ func main() {
 				//fmt.Println("commandList", len(commandList), commandList)
 				if 2 <= len(commandList) {
 					fieldNameFromCommand := commandList[2]
-					switch commandList[1] {
-					case SoftDelete:
+					command := commandList[1]
+					switch command {
+					case SoftDelete, SoftDeleteAt, UpdateAt, CreateAt:
 						softDeleteField, ok := fieldMap[fieldNameFromCommand]
 						if !ok {
 							log.Fatalf(" not found soft delete field %s", fieldNameFromCommand)
@@ -112,7 +113,8 @@ func main() {
 						}
 						tags, err := structtag.Parse(tagValue)
 						if nil != err {
-							log.Fatalf(" Parse tag is err: %s, structName: %s, filedName: %s", err, typeName, fieldNameFromCommand)
+							log.Fatalf(" Parse tag is err: %s, structName: %s, filedName: %s, command: %s", err,
+								typeName, fieldNameFromCommand, command)
 						}
 						bsonTag, _ := tags.Get("bson")
 						bsonName := ""
@@ -121,40 +123,18 @@ func main() {
 						} else {
 							bsonName = ToSnakeCase(fieldNameFromCommand)
 						}
-						if SoftDelete == commandList[1] && 3 <= len(commandList) {
-							if fieldName, ok := parseInfo[SoftDelete]; !ok {
-								parseStr += parseSoftDelete
+						if 3 <= len(commandList) {
+							if fieldName, ok := parseInfo[command]; !ok {
+								if SoftDelete == command {
+									parseStr += parseSoftDelete
+								}
 							} else {
-								log.Fatalf(" soft delete have been double declared, %s, %s", fieldName, commandList[2])
+								log.Fatalf(" soft delete have been double declared, %s, %s, %s",
+									command, fieldName, commandList[2])
 							}
-							parseInfo[SoftDelete] = commandList[2]
-							parseInfo[SoftDeleteBsonName] = bsonName
+							parseInfo[command] = commandList[2]
+							parseInfo[command+"_bson_name"] = bsonName
 						}
-					case SoftDeleteAt:
-						softDeleteAtField, ok := fieldMap[fieldNameFromCommand]
-						if !ok {
-							log.Fatalf(" not found soft delete field %s", fieldNameFromCommand)
-						}
-						tagValue := ""
-						if nil != softDeleteAtField.Tag {
-							tagValue = strings.Trim(softDeleteAtField.Tag.Value, "`")
-						}
-						tags, err := structtag.Parse(tagValue)
-						if nil != err {
-							log.Fatalf(" Parse tag is err: %s, structName: %s, filedName: %s", err, typeName, fieldNameFromCommand)
-						}
-						bsonName := ""
-						bsonTag, _ := tags.Get("bson")
-						if nil != bsonTag {
-							bsonName = bsonTag.Name
-						} else {
-							bsonName = ToSnakeCase(fieldNameFromCommand)
-						}
-						if fieldName, ok := parseInfo[SoftDeleteAt]; ok {
-							log.Fatalf(" soft delete at have been double declared, %s, %s", fieldName, fieldNameFromCommand)
-						}
-						parseInfo[SoftDeleteAt] = commandList[2]
-						parseInfo[SoftDeleteAtBsonName] = bsonName
 					}
 				}
 			}

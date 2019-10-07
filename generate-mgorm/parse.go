@@ -11,6 +11,9 @@ import (
 var _ = time.Now()
 
 func (model *{{.struct}}) Save() (err error) {
+	{{ if .create_at }}
+	model.{{.create_at}} = time.Now().UTC()
+	{{ end }}
 	return {{.client}}.Save(model)
 }
 
@@ -46,10 +49,16 @@ func (model *{{.struct}}) FindPage(query interface{}, iPageSize, iPageIndex int,
 func (model *{{.struct}}) UpdateByID() (err error) {
 	objectID := {{.struct}}.{{.id}}
 	query := bson.M{"_id": objectID}
+	{{ if .update_at }}
+	model.{{.update_at}} = time.Now().UTC()
+	{{ end }}
 	return {{.client}}.UpdateOne(query, model)
 }
 
 func (model *{{.struct}}) Update(query interface{}) (err error) {
+	{{ if .update_at }}
+	model.{{.update_at}} = time.Now().UTC()
+	{{ end }}
 	return {{.client}}.UpdateAll(query, model)
 }
 

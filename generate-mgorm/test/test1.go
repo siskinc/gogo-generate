@@ -13,9 +13,13 @@ var Client *mgorm.MongoDBClient = &mgorm.MongoDBClient{}
 //@def MogormTest struct comment3
 //@def soft_delete SoftDeleted
 //@def soft_delete_at SoftDeletedAt
+//@def update_at UpdateAt
+//@def create_at CreateAt
 type MogormTest struct {
 	//das
 	AA            bson.ObjectId `json:"aa" bson:"_id"` //@def aa
 	SoftDeleted   bool          `bson:"soft_deleted"`
 	SoftDeletedAt int64
+	UpdateAt      int64
+	CreateAt      int64
 }

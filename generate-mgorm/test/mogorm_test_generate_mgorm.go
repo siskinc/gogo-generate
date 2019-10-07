@@ -8,6 +8,9 @@ import (
 var _ = time.Now()
 
 func (model *MogormTest) Save() (err error) {
+
+	model.CreateAt = time.Now().UTC()
+
 	return Client.Save(model)
 }
 
@@ -43,10 +46,16 @@ func (model *MogormTest) FindPage(query interface{}, iPageSize, iPageIndex int, 
 func (model *MogormTest) UpdateByID() (err error) {
 	objectID := MogormTest.AA
 	query := bson.M{"_id": objectID}
+
+	model.UpdateAt = time.Now().UTC()
+
 	return Client.UpdateOne(query, model)
 }
 
 func (model *MogormTest) Update(query interface{}) (err error) {
+
+	model.UpdateAt = time.Now().UTC()
+
 	return Client.UpdateAll(query, model)
 }
 
